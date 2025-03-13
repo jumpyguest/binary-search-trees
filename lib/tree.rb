@@ -1,11 +1,13 @@
 class Tree
-  def initialize(array)
+  attr_reader :root
+
+  def initialize
     @root = nil
   end
 
   def build_tree(array)
     array.sort!.uniq!
-    array_to_BST(array, 0, array.length - 1)
+    @root = array_to_BST(array, 0, array.length - 1)
   end
 
   # recursive function to construct BST
@@ -36,6 +38,7 @@ class Tree
 
     root_node.left = insert(root_node.left, data) if data < root_node.data
     root_node.right = insert(root_node.right, data) if data > root_node.data
+    root_node
   end
 
   # mainly works when the right child is not empty, which is  the case we need in BST
@@ -99,5 +102,72 @@ class Tree
       queue.push(current_node.left) unless current_node.left.nil?
       queue.push(current_node.right) unless current_node.right.nil?
     end
+    queue
+  end
+
+  def inorder(root_node)
+    array = []
+    return array if root_node.nil?
+
+    array = array.union(inorder(root_node.left))
+    array << root_node.data
+    array = array.union(inorder(root_node.right))
+  end
+
+  def preorder(root_node)
+    array = []
+    return array if root_node.nil?
+
+    array << root_node.data
+    array = array.union(preorder(root_node.left))
+    array = array.union(preorder(root_node.right))
+  end
+
+  def postorder(root_node)
+    array = []
+    return array if root_node.nil?
+
+    array = array.union(postorder(root_node.left))
+    array = array.union(postorder(root_node.right))
+    array << root_node.data
+  end
+
+  def height(node)
+    num_edges = 0
+    return num_edges - 1 if node.nil?
+
+    num_edges += 1
+    num_edges_left = height(node.left)
+    num_edges_right = height(node.right)
+    num_edges += num_edges_left >= num_edges_right ? num_edges_left : num_edges_right
+  end
+
+  def depth(root_node, node)
+    num_edges = 0
+    while root_node
+      num_edges += 1
+      if node < root_node
+        num_edges += depth(root_node.left, node)
+      elsif node > root_node
+        num_edges += depth(root_node.right, node)
+      else
+        return num_edges
+      end
+    end
+    num_edges
+  end
+
+  def balanced?(root_node)
+    height_left = height(root_node.left)
+    height_right = height(root_node.right)
+    p "heightleft: #{height_left}"
+    p "heightright: #{height_right}"
+    (height_left - height_right).abs <= 1
+  end
+
+  def rebalance
+    array = level_order(@root)
+    p array
+    # build_tree(array)
   end
 end

@@ -44,7 +44,9 @@ class Tree
   # mainly works when the right child is not empty, which is  the case we need in BST
   def get_successor(curr)
     curr = curr.right
-    curr = curr.left until curr.nil? && curr.left.nil?
+    # NOTE: not using until loop so as to avoid accessing a nil.left access
+    # false first condition terminates the while loop immediately!
+    curr = curr.left while !curr.nil? && !curr.left.nil?
     curr
   end
 
@@ -77,16 +79,15 @@ class Tree
 
   # returns the node with the given data. Returns nil if not found
   def find(root_node, data)
-    while root_node
-      if data < root_node.data
-        find(root_node.left, data)
-      elsif data > root_node.data
-        find(root_node.right, data)
-      else
-        return root_node
-      end
+    return nil if root_node.nil?
+
+    if data < root_node.data
+      find(root_node.left, data)
+    elsif data > root_node.data
+      find(root_node.right, data)
+    else
+      root_node
     end
-    nil
   end
 
   # traverses block with the specified root node in breadth-first level order and
@@ -102,7 +103,7 @@ class Tree
       queue.push(current_node.left) unless current_node.left.nil?
       queue.push(current_node.right) unless current_node.right.nil?
     end
-    queue
+    nodes_array
   end
 
   def inorder(root_node)
@@ -144,17 +145,16 @@ class Tree
 
   def depth(root_node, node)
     num_edges = 0
-    while root_node
-      num_edges += 1
-      if node < root_node
-        num_edges += depth(root_node.left, node)
-      elsif node > root_node
-        num_edges += depth(root_node.right, node)
-      else
-        return num_edges
-      end
+    return num_edges if root_node.nil?
+
+    num_edges += 1
+    if node < root_node
+      num_edges += depth(root_node.left, node)
+    elsif node > root_node
+      num_edges += depth(root_node.right, node)
+    else
+      num_edges - 1
     end
-    num_edges
   end
 
   def balanced?(root_node)
@@ -167,7 +167,6 @@ class Tree
 
   def rebalance
     array = level_order(@root)
-    p array
-    # build_tree(array)
+    build_tree(array)
   end
 end

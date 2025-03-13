@@ -92,14 +92,14 @@ class Tree
 
   # traverses block with the specified root node in breadth-first level order and
   # returns an array of node values
-  def level_order(root_node)
+  def level_order(root_node, &block)
     queue = []
     nodes_array = []
 
     queue.push(root_node)
     until queue.empty?
       current_node = queue.shift
-      nodes_array << current_node.data
+      block_given? ? yield(current_node) : nodes_array << current_node.data
       queue.push(current_node.left) unless current_node.left.nil?
       queue.push(current_node.right) unless current_node.right.nil?
     end
